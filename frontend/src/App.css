@@ -1,0 +1,35 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 100px;
+}
+
+.App-header {
+  background-color: white;
+  height: 150px;
+  padding: 20px;
+  color: black;
+}
+
+.App-title {
+  font-size: 1.5em;
+}
+
+.App-intro {
+  font-size: large;
+}
+
+.result-box {
+  border: 1px solid black;
+  border-radius: 10px;
+  width: 30%;
+  margin: auto;
+  height: 1.5em;
+  line-height: 1.5em;
+}
+
+form {
+  padding-right: 10px;
+}
