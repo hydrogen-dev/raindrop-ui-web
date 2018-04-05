@@ -16,6 +16,7 @@ class App extends Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.firstTimeSignUp = this.firstTimeSignUp.bind(this);
+    this.generateMessage = this.generateMessage.bind(this);
     this.firstTimeVerification = this.firstTimeVerification.bind(this);
   }
 
@@ -48,7 +49,6 @@ class App extends Component {
       .then(data => {
         if (data['userExists']) {
           this.setState({signUpStatus: 'Username found'})
-          this.setState({messageToSign: raindrop.generateMessage()})
         } else {
           this.setState({signUpStatus: 'Username not found, please try again'})
         }
@@ -86,6 +86,11 @@ class App extends Component {
       });
   };
 
+  generateMessage (event) {
+    event.preventDefault();
+    this.setState({messageToSign: raindrop.generateMessage()})
+  };
+
   render() {
     return (
       <div className="App">
@@ -94,12 +99,14 @@ class App extends Component {
           <h1 className="App-title">Raindrop Two-Factor Authentication</h1>
         </header>
         <br></br>
-        <p className="App-intro">
-          First Time Sign-up
-        </p>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        <h1 className="App-title">First Time Sign-Up</h1>
         <form onSubmit={this.firstTimeSignUp}>
           <label>
-            Hydro Username
+            Hydro Username:
             <input type="text" value={this.state.userHydroUserName} onChange={this.handleChange} />
           </label>
           <input type="submit" value="Link" />
@@ -110,17 +117,22 @@ class App extends Component {
         </div>
         <br></br>
         <br></br>
-        <p className="App-intro">
-          First Time Verification
-        </p>
-        <p>Please enter this code in your Hydro App: {this.state.messageToSign}</p>
-        <form onSubmit={this.firstTimeVerification}>
-          <input type="submit" value="Proceed" />
+        <br></br>
+        <br></br>
+        <br></br>
+        <h1 className="App-title">Subsequent Authentications</h1>
+        <form onSubmit={this.generateMessage}>
+          <input type="submit" value="Generate" />
         </form>
+        <p>Please enter this code in your Hydro App: <i>{this.state.messageToSign}</i></p>
         <br></br>
         <div className="result-box">
           {this.state.verificationStatus}
         </div>
+        <br></br>
+        <form onSubmit={this.firstTimeVerification}>
+          <input type="submit" value="Proceed" />
+        </form>
       </div>
     );
   }
