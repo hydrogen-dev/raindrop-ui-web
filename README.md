@@ -5,6 +5,10 @@ This UI demo is an example implementation of the Raindrop Client Two Factor Auth
 ## Getting started
 The example backend runs on [express-generator](https://expressjs.com/en/starter/generator.html), while the frontend was generated with [create-react-app](https://github.com/facebook/create-react-app) skeleton code. After cloning the repository:
 
+### Enter your Hydro credentials
+- Update `backend/.env.example` with your credentials
+- Rename the config file to `.env`: `mv backend/.env.example backup/.env`
+
 ### Setting up the Backend
 - `cd backend`
 - `npm install`
