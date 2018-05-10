@@ -7,22 +7,29 @@ router.post('/', async function(req, res, next) {
   let internalUsername = req.body.internalUsername;
 
   // fail if the internal user already has a linked hydro username
-  await new Promise((resolve, reject) => {
+  let canRegister = await new Promise((resolve, reject) => {
     req.app.get('db').get(
       "SELECT * FROM hydro2FA WHERE internalUsername = ?", [ internalUsername ], (error, userInformation) => {
       if (userInformation !== undefined) {
         console.log("internal username already exists in the database")
-        res.json({registered: false})
+        reject()
+      } else {
+        resolve(true)
       }
-      resolve()
     })
   });
+
+  if (!canRegister) {
+    res.json({registered: false})
+    return
+  }
 
   // call the Hydro API with the internal user's claimed Hydro username
   req.app.get('ClientRaindropPartner').registerUser(hydroUsername)
     // if the API call to register the user was successful, save it in the database
     .then(result => {
-      req.app.get('db').run("INSERT INTO hydro2FA (internalUsername, hydroUsername, confirmed) VALUES (?, ?, ?)",
+      req.app.get('db').run(
+        "INSERT INTO hydro2FA (internalUsername, hydroUsername, confirmed) VALUES (?, ?, ?)",
         [internalUsername, hydroUsername, false], (error) => {
           if (error) {
             console.log(error)

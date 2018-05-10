@@ -11,11 +11,17 @@ router.post('/', async function(req, res, next) {
       "SELECT * FROM hydro2FA WHERE internalUsername = ?", [ internalUsername ], (error, userInformation) => {
       if (error) {
         console.log(error)
+        reject()
       } else {
         resolve(userInformation.hydroUsername)
       }
     })
   });
+
+  if (!hydroUsername) {
+    res.sendStatus(404)
+    return
+  }
 
   req.app.get('ClientRaindropPartner').unregisterUser(hydroUsername)
     // if the API call to unregister was successful, delete it in the database
