@@ -1,7 +1,7 @@
 // load project-specific packages
 var path = require('path');
 require('dotenv').config(); // load Hydro API credentials
-var raindrop = require('../../raindrop-sdk-js') // load the raindrop sdk
+var raindrop = require('@hydrogenplatform/raindrop') // load the raindrop sdk
 var sqlite3 = require('sqlite3'); //
 // load packages required by express
 var logger = require('morgan');
