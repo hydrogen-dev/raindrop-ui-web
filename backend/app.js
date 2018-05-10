@@ -1,55 +1,47 @@
-var createError = require('http-errors');
-var express = require('express');
+// load project-specific packages
 var path = require('path');
-require('dotenv').config()
-var cookieParser = require('cookie-parser');
+require('dotenv').config(); // load Hydro API credentials
+var raindrop = require('../../raindrop-sdk-js') // load the raindrop sdk
+var sqlite3 = require('sqlite3'); //
+// load packages required by express
 var logger = require('morgan');
-
-var raindrop = require('../../raindrop-sdk-js')
-
+var express = require('express');
+var createError = require('http-errors');
+var cookieParser = require('cookie-parser');
 var indexRouter = require('./routes/index');
+// load the routers that define endpoints in the backend's API
 var getDatabaseRouter = require('./routes/getDatabase');
-var deleteDatabaseRouter = require('./routes/deleteDatabase');
 var isInDatabaseRouter = require('./routes/isInDatabase');
 var registerUserRouter = require('./routes/registerUser');
+var deleteDatabaseRouter = require('./routes/deleteDatabase');
 var unregisterUserRouter = require('./routes/unregisterUser');
 var verifySignatureRouter = require('./routes/verifySignature');
 
 var app = express();
 
-// initialize client raindrop
+// initialize client raindrop object that will be wrapping our calls to the Hydro API
 var ClientRaindropPartner = new raindrop.client.RaindropPartner({
   clientId: process.env.clientId,
   clientSecret: process.env.clientSecret,
   applicationId: process.env.applicationId
 })
 
+// save the object in the backend's shared state
 ClientRaindropPartner.initialize({ environment: process.env.hydroEnvironment })
   .then(() => { console.log('Hydro API initialized.'); app.set('ClientRaindropPartner', ClientRaindropPartner) })
   .catch(e => console.log('Hydro API initialization failed:', e))
 
 // initialize database
-const sqlite3 = require('sqlite3');
 const db = new sqlite3.Database(path.join('database', 'myDatabase.sqlite'));
 
-new Promise((resolve,reject) => {
-  db.serialize(() => {
-    //db.run("DROP TABLE IF EXISTS hydro2FA");
-    db.run(
-      "CREATE TABLE IF NOT EXISTS hydro2FA (internalUsername TEXT PRIMARY KEY, hydroUsername TEXT UNIQUE, confirmed BOOLEAN)",
-      [],
-      (error) => {
-      if (error) {
-        console.log('Database initialization failed:', error)
-        resolve()
-      } else {
-        console.log('Database initialized.')
-        app.set('db', db)
-        resolve()
-      }
-    });
-  });
-})
+// save the database in the backend's shared state
+db.run(
+  "CREATE TABLE IF NOT EXISTS hydro2FA " +
+  "(internalUsername TEXT PRIMARY KEY, hydroUsername TEXT UNIQUE, confirmed BOOLEAN)",
+  [], (error) => {
+  if (error) {console.log('Database initialization failed:', error)}
+  else {console.log('Database initialized.'); app.set('db', db)}
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

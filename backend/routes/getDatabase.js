@@ -1,9 +1,8 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET getDatabase. */
+// returns the entire database...for demonstration purposes only
 router.get('/', function(req, res, next) {
-  // get the user's information from the hydro2FA database
   req.app.get('db').all("SELECT * FROM hydro2FA", [], (error, rows) => {
     if (error) {
       console.log(error)

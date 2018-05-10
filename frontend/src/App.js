@@ -128,12 +128,8 @@ class App extends Component {
       }
     })
       .then(response => { return response.json() })
-      .then(data => {
-        this.setState({database: data})
-      })
-      .catch(error => {
-        console.log(error)
-      });
+      .then(data => { this.setState({database: data}) })
+      .catch(error => { console.log(error) });
   }
 
   deleteDatabase (event) {
@@ -145,13 +141,8 @@ class App extends Component {
         'Accept': 'application/json'
       }
     })
-      .then(response => { return response.json() })
-      .then(data => {
-        this.refreshDatabase()
-      })
-      .catch(error => {
-        console.log(error)
-      });
+      .then(response => { this.refreshDatabase(); this.getLinkedHydroUsername(this.internalUsername) })
+      .catch(error => { console.log(error) });
   }
 
 
@@ -226,7 +217,7 @@ class App extends Component {
         'Accept': 'application/json'
       },
       body: JSON.stringify({
-        hydroUsername: this.state.claimedHydroUsername
+        internalUsername: this.state.internalUsername
       })
     })
       .then(() => {

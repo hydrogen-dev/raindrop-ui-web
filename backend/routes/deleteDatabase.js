@@ -1,12 +1,12 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET getDatabase. */
+// deletes the entire database...for demonstration purposes only
 router.delete('/', function(req, res, next) {
-  // get the user's information from the hydro2FA database
   req.app.get('db').run("DELETE FROM hydro2FA", [], (error) => {
     if (error) {
       console.log(error)
+      res.sendStatus(404)
     } else {
       res.sendStatus(200)
     }

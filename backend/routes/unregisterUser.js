@@ -1,25 +1,37 @@
-const path = require("path")
-const sqlite3 = require('sqlite3')
-
 var express = require('express');
 var router = express.Router();
 
-/* POST registerUser. */
+// unregisters an internal user and record it in the database
 router.post('/', async function(req, res, next) {
-  let hydroUsername = req.body.hydroUsername;
+  let internalUsername = req.body.internalUsername;
 
-  req.app.get('ClientRaindropPartner').unregisterUser(hydroUsername)
+  // get the internal user's hydro username from the database
+  let userInformation = await new Promise((resolve, reject) => {
+    req.app.get('db').get(
+      "SELECT * FROM hydro2FA WHERE internalUsername = ?", [ internalUsername ], (error, userInformation) => {
+      if (error) {
+        console.log(error)
+      } else {
+        resolve(userInformation)
+      }
+    })
+  });
+
+  req.app.get('ClientRaindropPartner').unregisterUser(userInformation.hydroUsername)
+    // if the API call to unregister was successful, delete it in the database
     .then(result => {
-      // if the API call to unregister was successful, delete it in your database
-      var db = new sqlite3.Database(path.join(__dirname, '..', 'database', 'myDatabase.sqlite'));
-      db.run("DELETE FROM hydro2FA WHERE hydroUsername = ?", [ hydroUsername ]);
-      db.close()
-      res.json({unregistered: true})
+      req.app.get('db').run("DELETE FROM hydro2FA WHERE hydroUsername = ?", [ hydroUsername ], (error) => {
+        if (error) {
+          console.log(error)
+          res.sendStatus(404)
+        } else {
+          res.json({unregistered: true})
+        }
+      });
     })
     .catch(error => {
-      // Log and deal with errors here
       console.log(error)
-      throw error
+      res.sendStatus(404)
     });
 });
 
