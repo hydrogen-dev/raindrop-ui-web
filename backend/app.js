@@ -53,11 +53,12 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// register our routes
 app.use('/', indexRouter);
-app.use('/isInDatabase', isInDatabaseRouter);
 app.use('/getDatabase', getDatabaseRouter);
-app.use('/deleteDatabase', deleteDatabaseRouter);
 app.use('/registerUser', registerUserRouter);
+app.use('/isInDatabase', isInDatabaseRouter);
+app.use('/deleteDatabase', deleteDatabaseRouter);
 app.use('/unregisterUser', unregisterUserRouter);
 app.use('/verifySignature', verifySignatureRouter);
 

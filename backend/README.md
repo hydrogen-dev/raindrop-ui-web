@@ -12,7 +12,7 @@ Next:
 - `npm install`
 - `npm start`
 
-The backend should now be listening on port 3001. You should see `Database initialized.` and `Hydro API initialized.` messages. If so, continue to frontend setup. If not, something went wrong. If that happens, please open a Github issue or submit a PR.
+The backend should now be listening on port 3001. You should see `Database initialized.` and `Hydro API initialized.` messages. If so, continue to frontend setup. If not, something went wrong, please open a Github issue or submit a PR.
 
 Note: If you need to use another port, edit the `start` command in `backend/package.json`, and update the `proxy` entry in `frontend/package.json`.
 

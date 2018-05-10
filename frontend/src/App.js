@@ -9,26 +9,36 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      internalUsername: localStorage.getItem('internalUsername') || 'TestUser',
+      database: [{}],
+
       raindropEnabled: false,
       hydroUsernameConfirmed: false,
-      linkedHydroUsername: null,
+
       claimedHydroUsername: '',
-      verificationMessage: raindrop.client.generateMessage(),
+      linkedHydroUsername: null,
+      internalUsername: localStorage.getItem('internalUsername') || 'TestUser',
+
+      signUpStatus: '',
+      verificationStatus: '',
+      firstTimeVerificationStatus: '',
+
       messageToSign: raindrop.client.generateMessage(),
-      database: [{}]
+      verificationMessage: raindrop.client.generateMessage()
     };
 
+    this.verify = this.verify.bind(this);
     this.registerUser = this.registerUser.bind(this);
     this.unregisterUser = this.unregisterUser.bind(this);
-    this.verify = this.verify.bind(this);
+
+    this.deleteDatabase = this.deleteDatabase.bind(this);
+    this.refreshDatabase = this.refreshDatabase.bind(this);
+    this.getLinkedHydroUsername(this.state.internalUsername);
+
     this.internalUsernameChange = this.internalUsernameChange.bind(this);
     this.claimedHydroUsernameChange = this.claimedHydroUsernameChange.bind(this);
-    this.refreshDatabase = this.refreshDatabase.bind(this);
-    this.deleteDatabase = this.deleteDatabase.bind(this);
-    this.getLinkedHydroUsername(this.state.internalUsername);
   }
 
+  // displays the status of the username based on state variables from the backend
   usernameStatus = () => {
     if (this.state.raindropEnabled && this.state.hydroUsernameConfirmed) {
       return (
@@ -65,10 +75,7 @@ class App extends Component {
     }
   }
 
-  claimedHydroUsernameChange(event) {
-    this.setState({claimedHydroUsername: event.target.value});
-  }
-
+  // displays the appropriate html depending on whether or not the internal user has raindrop enabled or not
   body = () => {
     if (!this.state.raindropEnabled || !this.state.hydroUsernameConfirmed) {
       return (
@@ -119,6 +126,19 @@ class App extends Component {
     }
   }
 
+  // updates the claimed hydro username on form change
+  claimedHydroUsernameChange(event) {
+    this.setState({claimedHydroUsername: event.target.value});
+  }
+
+  // updates the internal username. FOR EXAMPLE PURPOSES ONLY. Different names correspond to different users
+  internalUsernameChange (event) {
+    this.setState({internalUsername: event.target.value});
+    localStorage.setItem('internalUsername', event.target.value);
+    this.getLinkedHydroUsername(event.target.value);
+  }
+
+  // updates the displayed database at the bottom of the page from the backend. FOR EXAMPLE PURPOSES ONLY
   refreshDatabase () {
     fetch('/getDatabase', {
       method: 'GET',
@@ -132,6 +152,7 @@ class App extends Component {
       .catch(error => { console.log(error) });
   }
 
+  // clears the current database. FOR EXAMPLE PURPOSES ONLY
   deleteDatabase (event) {
     event.preventDefault();
     fetch('/deleteDatabase', {
@@ -145,7 +166,7 @@ class App extends Component {
       .catch(error => { console.log(error) });
   }
 
-
+  // updates state variables that define the state of the internal users's linkage to raindrop 2FA
   getLinkedHydroUsername (internalUsername) {
     this.refreshDatabase()
     fetch('/isInDatabase', {
@@ -173,12 +194,7 @@ class App extends Component {
       });
   }
 
-  internalUsernameChange (event) {
-    this.setState({internalUsername: event.target.value});
-    localStorage.setItem('internalUsername', event.target.value);
-    this.getLinkedHydroUsername(event.target.value);
-  }
-
+  // registers a user for Raindrop 2FA
   registerUser (event) {
     event.preventDefault();
     this.setState({signUpStatus: 'Loading...'})
@@ -208,6 +224,7 @@ class App extends Component {
       });
   };
 
+  // unregisters a user for Raindrop 2FA
   unregisterUser (event) {
     event.preventDefault();
     return fetch('/unregisterUser', {
@@ -228,6 +245,7 @@ class App extends Component {
       });
   };
 
+  // verifies a message (treats first-time verification requests differently that ongoing requests from verified users)
   verify (event, message, updateField) {
     event.preventDefault();
     this.setState({[updateField]: 'Loading...'})
@@ -264,6 +282,7 @@ class App extends Component {
       });
   };
 
+  // render the page
   render() {
     return (
       <div className="App">
