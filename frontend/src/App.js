@@ -3,138 +3,290 @@ import logo from './hydroLogo.svg';
 import './App.css';
 
 const raindrop = require('@hydrogenplatform/raindrop')
+const JsonTable = require('ts-react-json-table');
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      hydroUserName: '',
-      signUpStatus: '\n',
-      messageToSign: '',
-      verificationStatus: ''
+      internalUsername: localStorage.getItem('internalUsername') || 'TestUser',
+      raindropEnabled: false,
+      hydroUsernameConfirmed: false,
+      linkedHydroUsername: null,
+      claimedHydroUsername: '',
+      verificationMessage: raindrop.client.generateMessage(),
+      messageToSign: raindrop.client.generateMessage(),
+      database: [{}]
     };
 
-    this.handleChange = this.handleChange.bind(this);
-    this.signUp = this.signUp.bind(this);
-    this.generateMessage = this.generateMessage.bind(this);
+    this.registerUser = this.registerUser.bind(this);
+    this.unregisterUser = this.unregisterUser.bind(this);
     this.verify = this.verify.bind(this);
+    this.internalUsernameChange = this.internalUsernameChange.bind(this);
+    this.claimedHydroUsernameChange = this.claimedHydroUsernameChange.bind(this);
+    this.refreshDatabase = this.refreshDatabase.bind(this);
+    this.deleteDatabase = this.deleteDatabase.bind(this);
+    this.getLinkedHydroUsername(this.state.internalUsername);
   }
 
-  // componentDidMount () {
-  //     const script = document.createElement("script");
-  //
-  //     script.src = `https://rawgit.com/NoahHydro/e7e9efd3a98c9393d20aa542a99b582f/raw/` +
-  //                  `7c3e242d2ad6fd227e349baea198fa9132a92374/raindrop.js`;
-  //     script.async = true;
-  //
-  //     document.body.appendChild(script);
-  // }
-
-  handleChange(event) {
-    this.setState({hydroUserName: event.target.value});
+  usernameStatus = () => {
+    if (this.state.raindropEnabled && this.state.hydroUsernameConfirmed) {
+      return (
+        <div>
+          Your account <strong>does</strong> have Raindrop 2FA enabled, and it is <strong>confirmed</strong>.
+          <br/>
+          Your Hydro username is saved as: <strong>{this.state.linkedHydroUsername}</strong>.
+          <br/>
+          <br/>
+          <form onSubmit={this.unregisterUser}>
+            <input type="submit" value=" Unregister " />
+          </form>
+        </div>
+      )
+    } else if (this.state.raindropEnabled && !this.state.hydroUsernameConfirmed) {
+        return (
+          <div>
+            Your account <strong>does</strong> have Raindrop 2FA enabled, but it is <strong>unconfirmed</strong>.
+            <br/>
+            Your Hydro username is saved as: <strong>{this.state.linkedHydroUsername}</strong>.
+            <br/>
+            <br/>
+            <form onSubmit={this.unregisterUser}>
+              <input type="submit" value=" Unregister " />
+            </form>
+          </div>
+        )
+    } else {
+      return (
+        <div>
+          Your account <strong>does not</strong> have Raindrop 2FA enabled.
+        </div>
+      )
+    }
   }
 
-  signUp (event) {
+  claimedHydroUsernameChange(event) {
+    this.setState({claimedHydroUsername: event.target.value});
+  }
+
+  body = () => {
+    if (!this.state.raindropEnabled || !this.state.hydroUsernameConfirmed) {
+      return (
+        <div>
+          <h2>First Time Sign-Up</h2>
+            <p className="text">
+              Enter your Hydro username, visible in the Hydro mobile app.
+            </p>
+            <br/>
+            <form onSubmit={this.registerUser}>
+              <label>
+                Hydro Username: <input type="text" value={this.state.claimedHydroUsername} onChange={this.claimedHydroUsernameChange} />
+              </label>
+              <input type="submit" value=" Link " />
+            </form>
+            <br/>
+            <div className="result-box">
+              {this.state.signUpStatus}
+            </div>
+            <br/>
+            <p className="text">Complete first-time verification by entering the code below into the Hydro mobile app.</p>
+            <p><font size="+3">{this.state.verificationMessage}</font></p>
+            <form onSubmit={(e) => this.verify(e, this.state.verificationMessage, "firstTimeVerificationStatus")}>
+              <input type="submit" value=" Authenticate " />
+            </form>
+            <br/>
+            <div className="result-box">
+              {this.state.firstTimeVerificationStatus}
+            </div>
+            <br/>
+          </div>
+        )
+    } else {
+      return (
+        <div>
+          <h2>Authentication</h2>
+          <p className="text">Enter the code below into the Hydro mobile app</p>
+          <p><font size="+3">{this.state.messageToSign}</font></p>
+          <form onSubmit={(e) => this.verify(e, this.state.messageToSign, "verificationStatus")}>
+            <input type="submit" value=" Authenticate " />
+          </form>
+          <br/>
+          <div className="result-box">
+            {this.state.verificationStatus}
+          </div>
+        </div>
+      )
+    }
+  }
+
+  refreshDatabase () {
+    fetch('/getDatabase', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+    })
+      .then(response => { return response.json() })
+      .then(data => {
+        this.setState({database: data})
+      })
+      .catch(error => {
+        console.log(error)
+      });
+  }
+
+  deleteDatabase (event) {
     event.preventDefault();
-    this.setState({signUpStatus: 'Loading...'})
-    return fetch(`/registerUser`, {
+    fetch('/deleteDatabase', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+    })
+      .then(response => { return response.json() })
+      .then(data => {
+        this.refreshDatabase()
+      })
+      .catch(error => {
+        console.log(error)
+      });
+  }
+
+
+  getLinkedHydroUsername (internalUsername) {
+    this.refreshDatabase()
+    fetch('/isInDatabase', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
-      body: JSON.stringify({hydroUserName: this.state.hydroUserName})
+      body: JSON.stringify({
+        internalUsername: internalUsername
+      })
     })
       .then(response => { return response.json() })
       .then(data => {
-        if (data.registered) {
-          this.setState({signUpStatus: 'Successful linked, complete your sign-up by conducting a first-time verification'})
+        if (data.exists) {
+          this.setState(
+            {linkedHydroUsername: data.username, hydroUsernameConfirmed: data.confirmed, raindropEnabled: true}
+          )
         } else {
-          this.setState({signUpStatus: 'Unsuccessful link'})
+          this.setState({linkedHydroUsername: null, hydroUsernameConfirmed: false, raindropEnabled: false})
         }
       })
       .catch(error => {
         console.log(error)
-        this.setState({signUpStatus: 'Error, please try again.'})
+      });
+  }
+
+  internalUsernameChange (event) {
+    this.setState({internalUsername: event.target.value});
+    localStorage.setItem('internalUsername', event.target.value);
+    this.getLinkedHydroUsername(event.target.value);
+  }
+
+  registerUser (event) {
+    event.preventDefault();
+    this.setState({signUpStatus: 'Loading...'})
+    return fetch('/registerUser', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        internalUsername: this.state.internalUsername,
+        hydroUsername: this.state.claimedHydroUsername
+      })
+    })
+      .then(response => { return response.json() })
+      .then(data => {
+        if (data.registered) {
+          this.setState({signUpStatus: 'Successful link, proceed to verification'})
+          this.getLinkedHydroUsername(this.state.internalUsername);
+        } else {
+          this.setState({signUpStatus: 'Unsuccessful link (check backend logs)'})
+        }
+      })
+      .catch(error => {
+        console.log(error)
+        this.setState({signUpStatus: 'Error (check frontend logs)'})
       });
   };
 
-  verify (event) {
+  unregisterUser (event) {
     event.preventDefault();
-    this.setState({verificationStatus: 'Loading...'})
+    return fetch('/unregisterUser', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        hydroUsername: this.state.claimedHydroUsername
+      })
+    })
+      .then(() => {
+        this.getLinkedHydroUsername(this.state.internalUsername);
+      })
+      .catch(error => {
+        console.log(error)
+      });
+  };
+
+  verify (event, message, updateField) {
+    event.preventDefault();
+    this.setState({[updateField]: 'Loading...'})
     return fetch(`/verifySignature`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
-      // once first-time verification has gone through, sites will need to link the users' site-specific login to their
-      // hydroUserName, which will need to be provided to the hydrogen API every time the user wants to use Hydro 2FA
-      body: JSON.stringify({message: this.state.messageToSign, userName: this.state.hydroUserName})
+      // we only need to pass the user's internal identifier, their hydro username is already stored in the backend
+      body: JSON.stringify({message: message, internalUsername: this.state.internalUsername})
     })
       .then(response => { return response.json() })
       .then(data => {
         if (data.verified) {
-          this.setState({verificationStatus: 'Message Verified √'})
+          if (updateField === "firstTimeVerificationStatus") {
+            this.setState({[updateField]: 'Success! Redirecting, please wait...'})
+            setTimeout(() => {this.getLinkedHydroUsername(this.state.internalUsername)}, 4000)
+          } else {
+            this.setState({[updateField]: 'Success!'})
+          }
         } else {
-          this.setState({verificationStatus: 'Message Not Verified'})
+          this.setState({[updateField]: 'Failure (check backend logs)'})
         }
       })
       .catch(error => {
-        this.setState({verificationStatus: 'Error, please try again'})
+        this.setState({[updateField]: 'Error (check frontend logs)'})
         console.log(error)
       });
-  };
-
-  generateMessage (event) {
-    event.preventDefault();
-    this.setState({messageToSign: raindrop.client.generateMessage()})
   };
 
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Raindrop Two-Factor Authentication</h1>
-        </header>
-        <br></br>
-        <br></br>
-        <br></br>
-        <br></br>
-        <br></br>
-        <h1 className="App-title">Sign-Up</h1>
-        <form onSubmit={this.signUp}>
-          <label>
-            Hydro Username:
-            <input type="text" value={this.state.userHydroUserName} onChange={this.handleChange} />
-          </label>
-          <input type="submit" value="Link" />
+        <img src={logo} className="App-logo" alt="logo" />
+        <br/>
+        <hr color="black"></hr>
+        <h1>Client-Side Raindrop Demo</h1>
+        <label>Internal Username: </label><input type="text" value={this.state.internalUsername} onChange={this.internalUsernameChange} />
+        {this.usernameStatus()}
+        <br/>
+        <hr color="black"></hr>
+        {this.body()}
+        <br/>
+        <hr color="black"></hr>
+        <h2>Database</h2>
+        <form onSubmit={this.deleteDatabase}>
+          <input type="submit" value=" Reset Database " />
         </form>
-        <br></br>
-        Result:<div className="result-box">
-          {this.state.signUpStatus}
-        </div>
-        <br></br>
-        <br></br>
-        <br></br>
-        <br></br>
-        <br></br>
-        <h1 className="App-title">Authentication</h1>
-        <form onSubmit={this.generateMessage}>
-          <input type="submit" value="Generate Code" />
-        </form>
-        <p>Please enter this code in your Hydro App:
-        <br></br>
-        <i>{this.state.messageToSign}</i></p>
-        <br></br>
-        <form onSubmit={this.verify}>
-          <input type="submit" value="Proceed" />
-        </form>
-        <br></br>
-        Result:<div className="result-box">
-          {this.state.verificationStatus}
-        </div>
+        <JsonTable className='table' rows = {this.state.database} />
       </div>
     );
   }

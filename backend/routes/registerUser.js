@@ -1,31 +1,38 @@
-const raindrop = require('@hydrogenplatform/raindrop')
+const path = require("path")
+const sqlite3 = require('sqlite3')
 
 var express = require('express');
 var router = express.Router();
 
 /* POST registerUser. */
-router.post('/', function(req, res, next) {
-  const ClientRaindropPartner = new raindrop.client.RaindropPartner({
-    hydroKey: "T4CBW91VX7",
-    hydroUserName: "8B3BT6S3EX",
-    hydroApplicationId: "dfc1e611-763a-43d6-a89d-9c897e8075cd"
-  })
+router.post('/', async function(req, res, next) {
+  let hydroUsername = req.body.hydroUsername;
+  let internalUsername = req.body.internalUsername;
 
-  ClientRaindropPartner.setOptions({ environment: 'Dev' })
-
-  let userName = req.body.hydroUserName;
-
-  ClientRaindropPartner.registerUser(userName)
+  req.app.get('ClientRaindropPartner').registerUser(hydroUsername)
     .then(result => {
-      // Success logic here
-      console.log(result)
-      res.json({registered: true})
+      // if the API call to register the user was successful and the user doesn't already exist in your database, save
+      req.app.get('db').get("SELECT * FROM hydro2FA WHERE internalUsername = ?", [ internalUsername ], (error, userInformation) => {
+        if (userInformation === undefined) {
+          req.app.get('db').run("INSERT INTO hydro2FA (internalUsername, hydroUsername, confirmed) VALUES (?, ?, ?)",
+            [internalUsername, hydroUsername, false], (error) => {
+              if (error) {
+                console.log(error)
+              }
+              res.json({registered: true})
+            })
+        } else {
+          // don't allow duplicate internal usernames
+          console.log("internal username already exists in the database")
+          res.json({registered: false})
+        }
+      })
     })
     .catch(error => {
-      // Log errors here
+      // Log and deal with errors here
       console.log(error)
       res.json({registered: false})
-    });
+    })
 });
 
 module.exports = router;

@@ -30,6 +30,27 @@
   line-height: 1.5em;
 }
 
+table {
+    margin: auto;
+}
+
+hr {
+  width: 50%;
+}
+
 form {
   padding-right: 10px;
+}
+
+div {
+  padding-top: 5px;
+  padding-right: 5px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+}
+
+.text {
+  width: 75%;
+  display: table;
+  margin: auto;
 }
