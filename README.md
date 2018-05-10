@@ -19,4 +19,4 @@ In another terminal:
 The demo should now be live at [http://localhost:3000/](http://localhost:3000/).
 
 ## Copyright & License
-Copyright 2018 The Hydrogen Technology Corporation under the GNU General Public License v3.0.
+Copyright 2018 The Hydrogen Technology Corporation under the MIT License.

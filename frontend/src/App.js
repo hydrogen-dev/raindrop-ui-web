@@ -254,7 +254,12 @@ class App extends Component {
         if (data.verified) {
           if (updateField === "firstTimeVerificationStatus") {
             this.setState({[updateField]: 'Success! Redirecting, please wait...'})
-            setTimeout(() => {this.getLinkedHydroUsername(this.state.internalUsername)}, 4000)
+            setTimeout(() => {
+              this.getLinkedHydroUsername(this.state.internalUsername)
+              this.setState({
+                signUpStatus: "", firstTimeVerificationStatus: "", verificationStatus: "", claimedHydroUsername: ""
+              })
+            }, 4000)
           } else {
             this.setState({[updateField]: 'Success!'})
           }

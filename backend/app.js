@@ -25,8 +25,8 @@ var ClientRaindropPartner = new raindrop.client.RaindropPartner({
 })
 
 ClientRaindropPartner.initialize({ environment: process.env.hydroEnvironment })
-  .then(() => { console.log('API initialized.'); app.set('ClientRaindropPartner', ClientRaindropPartner) })
-  .catch(e => console.log('API initialization failed:', e))
+  .then(() => { console.log('Hydro API initialized.'); app.set('ClientRaindropPartner', ClientRaindropPartner) })
+  .catch(e => console.log('Hydro API initialization failed:', e))
 
 // initialize database
 const sqlite3 = require('sqlite3');
