@@ -30,22 +30,22 @@ router.post('/', async function(req, res, next) {
     if (!result.verified) {
       console.log("User did not sign the correct message.");
       res.json({verified: false})
-    }
-    console.log("test")
-    // if this was the first time the user verified a message, record it in the database
-    if (userInformation.confirmed == 0) {
-      await new Promise((resolve,reject) => {
-        req.app.get('db').run("UPDATE hydro2FA SET confirmed = 1 WHERE internalUsername = ?", [internalUsername], (error) => {
-          if (error) {
-            console.log(error)
-            reject()
-          } else {
-            resolve()
-          }
+    } else {
+      // if this was the first time the user verified a message, record it in the database
+      if (userInformation.confirmed == 0) {
+        await new Promise((resolve,reject) => {
+          req.app.get('db').run("UPDATE hydro2FA SET confirmed = 1 WHERE internalUsername = ?", [internalUsername], (error) => {
+            if (error) {
+              console.log(error)
+              reject()
+            } else {
+              resolve()
+            }
+          })
         })
-      })
+      }
+      res.json({verified: true})
     }
-    res.json({verified: true})
   })
   .catch((error) => {
     console.log(error)
