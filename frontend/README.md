@@ -9,6 +9,8 @@ The frontend was generated with [create-react-app](https://github.com/facebook/c
 
 The frontend should now be live on [port 3000]((http://localhost:3000/)). If something goes wrong, please open a Github issue or submit a PR.
 
+## Code
+The logic is contained in [src/App.js](./src/App.js).
 
 ## Copyright & License
 Copyright 2018 The Hydrogen Technology Corporation under the MIT License.

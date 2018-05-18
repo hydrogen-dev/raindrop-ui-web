@@ -16,6 +16,8 @@ The backend should now be listening on port 3001. You should see `Database initi
 
 Note: If you need to use another port, edit the `start` command in `backend/package.json`, and update the `proxy` entry in `frontend/package.json`.
 
+## Code
+Setup logic is contained in [app.js](./app.js). This is where the database and Raindrop SDK are initialized. Individual endpoints are defined in [routes/](./routes/). Of these, `deleteDatabase`, `getDatabase`, and `index` exist solely for testing purposes. The others, `isInDatabase`, `registerUser`, `unregisterUser`, and `verifySignature` will likely be implemented in some form by websites integrating Client Raindrop.
 
 ## Copyright & License
 Copyright 2018 The Hydrogen Technology Corporation under the MIT License.
