@@ -6,7 +6,7 @@
     "start": "PORT=3001 node ./bin/www"
   },
   "dependencies": {
-    "@hydrogenplatform/raindrop": "^0.2.2",
+    "@hydrogenplatform/raindrop": "^0.2.4",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
     "dotenv": "^5.0.1",

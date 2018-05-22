@@ -21,15 +21,14 @@ var app = express();
 
 // initialize client raindrop object that will be wrapping our calls to the Hydro API
 var ClientRaindropPartner = new raindrop.client.RaindropPartner({
+  environment: process.env.hydroEnvironment,
   clientId: process.env.clientId,
   clientSecret: process.env.clientSecret,
   applicationId: process.env.applicationId
 })
 
 // save the object in the backend's shared state
-ClientRaindropPartner.initialize({ environment: process.env.hydroEnvironment })
-  .then(() => { console.log('Hydro API initialized.'); app.set('ClientRaindropPartner', ClientRaindropPartner) })
-  .catch(e => console.log('Hydro API initialization failed:', e))
+app.set('ClientRaindropPartner', ClientRaindropPartner)
 
 // initialize database
 const db = new sqlite3.Database(path.join('database', 'myDatabase.sqlite'));
