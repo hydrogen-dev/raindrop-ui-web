@@ -287,21 +287,20 @@ class App extends Component {
     return (
       <div className="App">
         <img src={logo} className="App-logo" alt="logo" />
-        <br/>
-        <hr color="black"></hr>
         <h1>Client-Side Raindrop Demo</h1>
+        <hr color="black"></hr>
+        {this.body()}
+        <hr color="black"></hr>
+        <h2>Session Data</h2>
         <label>Internal Username: </label><input type="text" value={this.state.internalUsername} onChange={this.internalUsernameChange} />
         {this.usernameStatus()}
         <br/>
-        <hr color="black"></hr>
-        {this.body()}
-        <br/>
-        <hr color="black"></hr>
         <h2>Database</h2>
         <form onSubmit={this.deleteDatabase}>
           <input type="submit" value=" Reset Database " />
         </form>
         <JsonTable className='table' rows = {this.state.database} />
+        <br/>
       </div>
     );
   }

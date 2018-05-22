@@ -12,7 +12,7 @@ router.post('/', async function(req, res, next) {
       "SELECT * FROM hydro2FA WHERE internalUsername = ?", [ internalUsername ], (error, userInformation) => {
       if (userInformation !== undefined) {
         console.log("internal username already exists in the database")
-        reject()
+        resolve(false)
       } else {
         resolve(true)
       }
