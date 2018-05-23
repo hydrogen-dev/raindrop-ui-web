@@ -29,7 +29,7 @@ var ClientRaindropPartner = new raindrop.client.RaindropPartner({
   clientId: process.env.clientId,
   clientSecret: process.env.clientSecret,
   applicationId: process.env.applicationId
-})``
+})
 
 // save the object in the backend's shared state
 app.set('ClientRaindropPartner', ClientRaindropPartner)

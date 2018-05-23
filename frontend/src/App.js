@@ -288,15 +288,12 @@ class App extends Component {
       <div className="App">
         <img src={logo} className="App-logo" alt="logo" />
         <h1>Client-Side Raindrop Demo</h1>
-        <label>Internal Username: </label><input type="text" value={this.state.internalUsername} onChange={this.internalUsernameChange} />
-        {this.hydroIDStatus()}
-        <br/>
         <hr color="black"></hr>
         {this.body()}
         <hr color="black"></hr>
         <h2>Session Data</h2>
         <label>Internal Username: </label><input type="text" value={this.state.internalUsername} onChange={this.internalUsernameChange} />
-        {this.usernameStatus()}
+        {this.hydroIDStatus()}
         <br/>
         <h2>Database</h2>
         <form onSubmit={this.deleteDatabase}>
