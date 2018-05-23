@@ -3,7 +3,7 @@ var router = express.Router();
 
 // registers an internal user if the Hydro API call with their claimed username succeeds, records it in the database
 router.post('/', async function(req, res, next) {
-  let hydroId = req.body.hydroID;
+  let hydroID = req.body.hydroID;
   let internalUsername = req.body.internalUsername;
 
   // fail if the internal user already has a linked hydro username
@@ -25,7 +25,7 @@ router.post('/', async function(req, res, next) {
   }
 
   // call the Hydro API with the internal user's claimed Hydro username
-  req.app.get('ClientRaindropPartner').registerUser(hydroId)
+  req.app.get('ClientRaindropPartner').registerUser(hydroID)
     // if the API call to register the user was successful, save it in the database
     .then(result => {
       req.app.get('db').run(
