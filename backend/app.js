@@ -19,13 +19,17 @@ var verifySignatureRouter = require('./routes/verifySignature');
 
 var app = express();
 
+if (process.env.hydroEnvironment === undefined) {
+  throw new Error("No configuration file loaded, is your .env file configured properly?")
+}
+
 // initialize client raindrop object that will be wrapping our calls to the Hydro API
 var ClientRaindropPartner = new raindrop.client.RaindropPartner({
   environment: process.env.hydroEnvironment,
   clientId: process.env.clientId,
   clientSecret: process.env.clientSecret,
   applicationId: process.env.applicationId
-})
+})``
 
 // save the object in the backend's shared state
 app.set('ClientRaindropPartner', ClientRaindropPartner)
