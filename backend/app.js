@@ -36,7 +36,7 @@ const db = new sqlite3.Database(path.join('database', 'myDatabase.sqlite'));
 // save the database in the backend's shared state
 db.run(
   "CREATE TABLE IF NOT EXISTS hydro2FA " +
-  "(internalUsername TEXT PRIMARY KEY, hydroUsername TEXT UNIQUE, confirmed BOOLEAN)",
+  "(internalUsername TEXT PRIMARY KEY, hydroID TEXT UNIQUE, confirmed BOOLEAN)",
   [], (error) => {
   if (error) {console.log('Database initialization failed:', error)}
   else {console.log('Database initialized.'); app.set('db', db)}

@@ -12,10 +12,10 @@ class App extends Component {
       database: [{}],
 
       raindropEnabled: false,
-      hydroUsernameConfirmed: false,
+      hydroIDConfirmed: false,
 
-      claimedHydroUsername: '',
-      linkedHydroUsername: null,
+      claimedHydroID: '',
+      linkedHydroID: null,
       internalUsername: localStorage.getItem('internalUsername') || 'TestUser',
 
       signUpStatus: '',
@@ -32,20 +32,20 @@ class App extends Component {
 
     this.deleteDatabase = this.deleteDatabase.bind(this);
     this.refreshDatabase = this.refreshDatabase.bind(this);
-    this.getLinkedHydroUsername(this.state.internalUsername);
+    this.getLinkedHydroID(this.state.internalUsername);
 
     this.internalUsernameChange = this.internalUsernameChange.bind(this);
-    this.claimedHydroUsernameChange = this.claimedHydroUsernameChange.bind(this);
+    this.claimedHydroIDChange = this.claimedHydroIDChange.bind(this);
   }
 
-  // displays the status of the username based on state variables from the backend
-  usernameStatus = () => {
-    if (this.state.raindropEnabled && this.state.hydroUsernameConfirmed) {
+  // displays the status of the hydroID based on state variables from the backend
+  hydroIDStatus = () => {
+    if (this.state.raindropEnabled && this.state.hydroIDConfirmed) {
       return (
         <div>
           Your account <strong>does</strong> have Raindrop 2FA enabled, and it is <strong>confirmed</strong>.
           <br/>
-          Your Hydro username is saved as: <strong>{this.state.linkedHydroUsername}</strong>.
+          Your HydroID is saved as: <strong>{this.state.linkedHydroID}</strong>.
           <br/>
           <br/>
           <form onSubmit={this.unregisterUser}>
@@ -53,12 +53,12 @@ class App extends Component {
           </form>
         </div>
       )
-    } else if (this.state.raindropEnabled && !this.state.hydroUsernameConfirmed) {
+    } else if (this.state.raindropEnabled && !this.state.hydroIDConfirmed) {
         return (
           <div>
             Your account <strong>does</strong> have Raindrop 2FA enabled, but it is <strong>unconfirmed</strong>.
             <br/>
-            Your Hydro username is saved as: <strong>{this.state.linkedHydroUsername}</strong>.
+            Your HydroID is saved as: <strong>{this.state.linkedHydroID}</strong>.
             <br/>
             <br/>
             <form onSubmit={this.unregisterUser}>
@@ -77,17 +77,17 @@ class App extends Component {
 
   // displays the appropriate html depending on whether or not the internal user has raindrop enabled or not
   body = () => {
-    if (!this.state.raindropEnabled || !this.state.hydroUsernameConfirmed) {
+    if (!this.state.raindropEnabled || !this.state.hydroIDConfirmed) {
       return (
         <div>
           <h2>First Time Sign-Up</h2>
             <p className="text">
-              Enter your Hydro username, visible in the Hydro mobile app.
+              Enter your HydroID, visible in the Hydro mobile app.
             </p>
             <br/>
             <form onSubmit={this.registerUser}>
               <label>
-                Hydro Username: <input type="text" value={this.state.claimedHydroUsername} onChange={this.claimedHydroUsernameChange} />
+                HydroID: <input type="text" value={this.state.claimedHydroID} onChange={this.claimedHydroIDChange} />
               </label>
               <input type="submit" value=" Link " />
             </form>
@@ -126,16 +126,16 @@ class App extends Component {
     }
   }
 
-  // updates the claimed hydro username on form change
-  claimedHydroUsernameChange(event) {
-    this.setState({claimedHydroUsername: event.target.value});
+  // updates the claimed hydroID on form change
+  claimedHydroIDChange(event) {
+    this.setState({claimedHydroID: event.target.value});
   }
 
   // updates the internal username. FOR EXAMPLE PURPOSES ONLY. Different names correspond to different users
   internalUsernameChange (event) {
     this.setState({internalUsername: event.target.value});
     localStorage.setItem('internalUsername', event.target.value);
-    this.getLinkedHydroUsername(event.target.value);
+    this.getLinkedHydroID(event.target.value);
   }
 
   // updates the displayed database at the bottom of the page from the backend. FOR EXAMPLE PURPOSES ONLY
@@ -162,12 +162,12 @@ class App extends Component {
         'Accept': 'application/json'
       }
     })
-      .then(response => { this.refreshDatabase(); this.getLinkedHydroUsername(this.internalUsername) })
+      .then(response => { this.refreshDatabase(); this.getLinkedHydroID(this.internalUsername) })
       .catch(error => { console.log(error) });
   }
 
   // updates state variables that define the state of the internal users's linkage to raindrop 2FA
-  getLinkedHydroUsername (internalUsername) {
+  getLinkedHydroID (internalUsername) {
     this.refreshDatabase()
     fetch('/isInDatabase', {
       method: 'POST',
@@ -183,10 +183,10 @@ class App extends Component {
       .then(data => {
         if (data.exists) {
           this.setState(
-            {linkedHydroUsername: data.username, hydroUsernameConfirmed: data.confirmed, raindropEnabled: true}
+            {linkedHydroID: data.hydroID, hydroIDConfirmed: data.confirmed, raindropEnabled: true}
           )
         } else {
-          this.setState({linkedHydroUsername: null, hydroUsernameConfirmed: false, raindropEnabled: false})
+          this.setState({linkedHydroID: null, hydroIDConfirmed: false, raindropEnabled: false})
         }
       })
       .catch(error => {
@@ -206,14 +206,14 @@ class App extends Component {
       },
       body: JSON.stringify({
         internalUsername: this.state.internalUsername,
-        hydroUsername: this.state.claimedHydroUsername
+        hydroID: this.state.claimedHydroID
       })
     })
       .then(response => { return response.json() })
       .then(data => {
         if (data.registered) {
           this.setState({signUpStatus: 'Successful link, proceed to verification'})
-          this.getLinkedHydroUsername(this.state.internalUsername);
+          this.getLinkedHydroID(this.state.internalUsername);
         } else {
           this.setState({signUpStatus: 'Unsuccessful link (check backend logs)'})
         }
@@ -238,7 +238,7 @@ class App extends Component {
       })
     })
       .then(() => {
-        this.getLinkedHydroUsername(this.state.internalUsername);
+        this.getLinkedHydroID(this.state.internalUsername);
       })
       .catch(error => {
         console.log(error)
@@ -264,9 +264,9 @@ class App extends Component {
           if (updateField === "firstTimeVerificationStatus") {
             this.setState({[updateField]: 'Success! Redirecting, please wait...'})
             setTimeout(() => {
-              this.getLinkedHydroUsername(this.state.internalUsername)
+              this.getLinkedHydroID(this.state.internalUsername)
               this.setState({
-                signUpStatus: "", firstTimeVerificationStatus: "", verificationStatus: "", claimedHydroUsername: ""
+                signUpStatus: "", firstTimeVerificationStatus: "", verificationStatus: "", claimedHydroID: ""
               })
             }, 4000)
           } else {
@@ -291,7 +291,7 @@ class App extends Component {
         <hr color="black"></hr>
         <h1>Client-Side Raindrop Demo</h1>
         <label>Internal Username: </label><input type="text" value={this.state.internalUsername} onChange={this.internalUsernameChange} />
-        {this.usernameStatus()}
+        {this.hydroIDStatus()}
         <br/>
         <hr color="black"></hr>
         {this.body()}

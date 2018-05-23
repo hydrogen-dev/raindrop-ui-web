@@ -13,7 +13,7 @@ router.post('/', async function(req, res, next) {
     if (userInformation === undefined) {
       res.json({exists: false})
     } else {
-      res.json({exists: true, username: userInformation.hydroUsername, confirmed: userInformation.confirmed})
+      res.json({exists: true, hydroID: userInformation.hydroID, confirmed: userInformation.confirmed})
     }
   });
 });

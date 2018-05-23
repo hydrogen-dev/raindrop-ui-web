@@ -25,7 +25,7 @@ router.post('/', async function(req, res, next) {
   }
 
   // else, call the Hydro API
-  req.app.get('ClientRaindropPartner').verifySignature(userInformation.hydroUsername, message)
+  req.app.get('ClientRaindropPartner').verifySignature(userInformation.hydroID, message)
   .then(async (result) => {
     if (!result.verified) {
       console.log("User did not sign the correct message.");
