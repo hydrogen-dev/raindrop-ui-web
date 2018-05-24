@@ -6,9 +6,7 @@ This example backend runs on [express-generator](https://expressjs.com/en/starte
 The backend also integrates with a basic sqlite database in `database/`. This database is created automatically when the backend is initialized, and is accessed via API calls from the frontend.
 
 ## Setup
-First, inform the backend of your secret Hydro API credentials. Open `.env.example`, update it with the appropriate values per the [Raindrop SDK](https://github.com/hydrogen-dev/raindrop-sdk-js), and rename it to `.env`. This ensures that your backend can appropriately authenticate with the Hydro API.
-
-Next:
+- Open `.env.example`, and enter your Hydro API credentials. `clientId` and `clientSecret` are your OAuth credentials for the Hydro API, an `applicationId` will be assigned to you on the Hydrogen Platform developer portal, and `hydroEnvironment` will be either `Sandbox` or `Production`. For more information, see the [Raindrop SDK](https://github.com/hydrogen-dev/raindrop-sdk-js). When you're finished, rename the file to `.env`.
 - `npm install`
 - `npm start`
 

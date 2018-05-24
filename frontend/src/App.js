@@ -30,7 +30,6 @@ class App extends Component {
     this.registerUser = this.registerUser.bind(this);
     this.unregisterUser = this.unregisterUser.bind(this);
 
-    this.deleteDatabase = this.deleteDatabase.bind(this);
     this.refreshDatabase = this.refreshDatabase.bind(this);
     this.getLinkedHydroID(this.state.internalUsername);
 
@@ -149,20 +148,6 @@ class App extends Component {
     })
       .then(response => { return response.json() })
       .then(data => { this.setState({database: data}) })
-      .catch(error => { console.log(error) });
-  }
-
-  // clears the current database. FOR EXAMPLE PURPOSES ONLY
-  deleteDatabase (event) {
-    event.preventDefault();
-    fetch('/deleteDatabase', {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      }
-    })
-      .then(response => { this.refreshDatabase(); this.getLinkedHydroID(this.internalUsername) })
       .catch(error => { console.log(error) });
   }
 
@@ -296,9 +281,6 @@ class App extends Component {
         {this.hydroIDStatus()}
         <br/>
         <h2>Database</h2>
-        <form onSubmit={this.deleteDatabase}>
-          <input type="submit" value=" Reset Database " />
-        </form>
         <JsonTable className='table' rows = {this.state.database} />
         <br/>
       </div>
