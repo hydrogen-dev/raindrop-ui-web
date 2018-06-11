@@ -3,7 +3,9 @@ var router = express.Router();
 
 // verifies signatures from internal users that have a registered hydro username
 router.post('/', async function(req, res, next) {
-  let message = req.body.message;
+  let message = req.session.message; // get the message from the cookie
+  // WARNING: THE FOLLOWING LINE IS NOT PRODUCTION-SAFE.
+  // Backend logic should never depend on data passed in from a front-end. Rely on server-side sessions instead.
   let internalUsername = req.body.internalUsername;
 
   // get the user's information from the hydro2FA database
@@ -36,7 +38,8 @@ router.post('/', async function(req, res, next) {
     // if this was the first time the user verified a message, record it in the database
     if (userInformation.confirmed == 0) {
       let saved = await new Promise((resolve,reject) => {
-        req.app.get('db').run("UPDATE hydro2FA SET confirmed = 1 WHERE internalUsername = ?", [internalUsername], (error) => {
+        req.app.get('db').run(
+          "UPDATE hydro2FA SET confirmed = 1 WHERE internalUsername = ?", [internalUsername], (error) => {
           if (error) {
             console.log(error)
             reject()

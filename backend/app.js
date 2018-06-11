@@ -7,9 +7,10 @@ var sqlite3 = require('sqlite3'); //
 var logger = require('morgan');
 var express = require('express');
 var createError = require('http-errors');
-var cookieParser = require('cookie-parser');
-var indexRouter = require('./routes/index');
+// var cookieParser = require('cookie-parser');
+var session = require('express-session')
 // load the routers that define endpoints in the backend's API
+var messageRouter = require('./routes/message');
 var getDatabaseRouter = require('./routes/getDatabase');
 var isInDatabaseRouter = require('./routes/isInDatabase');
 var registerUserRouter = require('./routes/registerUser');
@@ -53,11 +54,19 @@ app.set('view engine', 'jade');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
+// app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// initialize sessions
+app.use(session({
+  secret: 'hydro', // should in reality be an actual secret
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false } // should be set to true in a production environment
+}))
+
 // register our routes
-app.use('/', indexRouter);
+app.use('/message', messageRouter);
 app.use('/getDatabase', getDatabaseRouter);
 app.use('/registerUser', registerUserRouter);
 app.use('/isInDatabase', isInDatabaseRouter);

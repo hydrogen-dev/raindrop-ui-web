@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@hydrogenplatform/raindrop": "^0.2.5",
     "react": "^16.3.1",
     "react-dom": "^16.3.1",
+    "react-qr-svg": "^2.1.0",
     "react-scripts": "1.1.4",
     "ts-react-json-table": "^0.1.1"
   },
