@@ -2,19 +2,18 @@
 var path = require('path');
 require('dotenv').config(); // load Hydro API credentials
 var raindrop = require('@hydrogenplatform/raindrop') // load the raindrop sdk
-var sqlite3 = require('sqlite3'); //
+var sqlite3 = require('sqlite3'); // load our DB manager
 // load packages required by express
 var logger = require('morgan');
 var express = require('express');
+var cookieParser = require('cookie-parser');
 var createError = require('http-errors');
-// var cookieParser = require('cookie-parser');
 var session = require('express-session')
 // load the routers that define endpoints in the backend's API
-var messageRouter = require('./routes/message');
 var getDatabaseRouter = require('./routes/getDatabase');
 var isInDatabaseRouter = require('./routes/isInDatabase');
+var messageRouter = require('./routes/message');
 var registerUserRouter = require('./routes/registerUser');
-var deleteDatabaseRouter = require('./routes/deleteDatabase');
 var unregisterUserRouter = require('./routes/unregisterUser');
 var verifySignatureRouter = require('./routes/verifySignature');
 
@@ -24,7 +23,7 @@ if (process.env.hydroEnvironment === undefined) {
   throw new Error("No configuration file loaded, is your .env file configured properly?")
 }
 
-// initialize client raindrop object that will be wrapping our calls to the Hydro API
+// initialize client raindrop object that will wrap our calls to the Hydro API and save it in the backend's shared state
 var ClientRaindropPartner = new raindrop.client.RaindropPartner({
   environment: process.env.hydroEnvironment,
   clientId: process.env.clientId,
@@ -32,19 +31,19 @@ var ClientRaindropPartner = new raindrop.client.RaindropPartner({
   applicationId: process.env.applicationId
 })
 
-// save the object in the backend's shared state
 app.set('ClientRaindropPartner', ClientRaindropPartner)
 
-// initialize database
-const db = new sqlite3.Database(path.join('database', 'myDatabase.sqlite'));
+console.log("Javascript SDK for the Hydro API Initialized.")
 
-// save the database in the backend's shared state
+// initialize database and save it in the backend's shared state
+var db = new sqlite3.Database(path.join('database', 'myDatabase.sqlite'));
+
 db.run(
   "CREATE TABLE IF NOT EXISTS hydro2FA " +
   "(internalUsername TEXT PRIMARY KEY, hydroID TEXT UNIQUE, confirmed BOOLEAN)",
   [], (error) => {
   if (error) {console.log('Database initialization failed:', error)}
-  else {console.log('Database initialized.'); app.set('db', db)}
+  else {console.log('Database initialized in database/myDatabase.sqlite.'); app.set('db', db)}
 });
 
 // view engine setup
@@ -54,23 +53,23 @@ app.set('view engine', 'jade');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-// app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // initialize sessions
+app.use(cookieParser('hydro'));
+
 app.use(session({
   secret: 'hydro', // should in reality be an actual secret
-  resave: false,
-  saveUninitialized: false,
-  cookie: { secure: false } // should be set to true in a production environment
+  resave: true, // will vary per-project
+  saveUninitialized: false, // will vary per-project
+  cookie: { secure: false } // secure should be set to true in a production environment
 }))
 
 // register our routes
-app.use('/message', messageRouter);
 app.use('/getDatabase', getDatabaseRouter);
-app.use('/registerUser', registerUserRouter);
 app.use('/isInDatabase', isInDatabaseRouter);
-app.use('/deleteDatabase', deleteDatabaseRouter);
+app.use('/message', messageRouter);
+app.use('/registerUser', registerUserRouter);
 app.use('/unregisterUser', unregisterUserRouter);
 app.use('/verifySignature', verifySignatureRouter);
 

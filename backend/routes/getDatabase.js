@@ -7,7 +7,7 @@ router.get('/', function(req, res, next) {
     if (error) {
       console.log(error)
     }
-    res.json(rows ? rows : [{}])
+    res.json(rows ? rows : [{}]);
   });
 });
 

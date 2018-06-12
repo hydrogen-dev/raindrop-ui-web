@@ -1,7 +1,7 @@
 # Frontend
 
 ## Getting started
-The frontend was generated with [create-react-app](https://github.com/facebook/create-react-app). It's a dynamic webpage that integrates with the backend through the backend's public-facing API. It also receives data from the Hydro API via the backend (the frontend cannot communicate directly with the Hydro API because it cannot store credentials without exposing them to the internet).
+The frontend was generated with [create-react-app](https://github.com/facebook/create-react-app). It's a dynamic webpage that integrates with the backend through the backend's public-facing API. It also receives data from the Hydro API via the backend (the frontend cannot communicate directly with the Hydro API because it cannot store credentials without exposing them to the internet). All logic is contained in [src/App.js](./src/App.js).
 
 ## Setup
 - `npm install`
