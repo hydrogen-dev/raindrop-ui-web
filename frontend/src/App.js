@@ -46,10 +46,10 @@ class App extends Component {
       <div className="App">
         <img src={logo} className="App-logo" alt="logo" />
         <h1>Client-Side Raindrop Demo</h1>
-        <p>Enable QR codes?</p>
-        <Toggle
+        <div>Enable QR codes? <Toggle
           defaultChecked={this.state.QREnabled}
           onChange={this.toggleQRCodes} />
+        </div>
         <hr color="black"></hr>
         {this.body()}
         <hr color="black"></hr>
@@ -76,14 +76,11 @@ class App extends Component {
       return (
         <div>
           <h2>First Time Sign-Up</h2>
-            <p className="text">
-              Enter your HydroID, visible in the Hydro mobile app.
-            </p>
-            <br/>
             <form onSubmit={this.registerUser}>
-              <label>
-                HydroID: <input type="text" value={this.state.claimedHydroID} onChange={this.claimedHydroIDChange} />
-              </label>
+              Enter your HydroID:
+              {' '}
+              <input type="text" value={this.state.claimedHydroID} onChange={this.claimedHydroIDChange} />
+              {' '}
               <input type="submit" value=" Link " />
             </form>
             <br/>
@@ -92,8 +89,9 @@ class App extends Component {
             </div>
             <br/>
             <p className="text">
-              Complete first-time verification by {this.state.QREnabled ? "scanning ": "entering "}
-              the code below in the Hydro mobile app.
+              To complete your sign-up, {this.state.QREnabled ? "scan": "enter"}
+              {' '}
+              this code in the Hydro mobile app:
             </p>
             {this.renderMessage()}
             <form onSubmit={(event) => this.verify(event, "firstTimeVerificationStatus")}>
@@ -148,7 +146,7 @@ class App extends Component {
       .then(response => { return response.json() })
       .then(data => {
         if (data.registered) {
-          this.setState({signUpStatus: 'Successful link, proceed to verification'})
+          this.setState({signUpStatus: 'Successful link, proceed to complete sign-up'})
           this.getLinkedHydroID(this.state.internalUsername);
         } else {
           this.setState({signUpStatus: 'Unsuccessful link (check backend logs)'})
