@@ -19,6 +19,7 @@ Setup logic is contained in [app.js](./app.js). This is where the database and R
 
 Briefly, these endpoints are defined as follows:
 - `getDatabase`: returns the contents of the backend database to the frontend. Exists solely for testing purposes.
+- `isInDatabase`: queries the backend database to see whether or not a user has linked a hydroID.
 - `message`: generates a message for the user to sign and stores it in a secure session.
 - `registerUser`: registers an internal user's claimed HydroID with the Hydro API and logs this in the internal DB.
 - `unregisterUser`: unregisters an internal user's linked HydroID with the Hydro API and logs this in the internal DB.
