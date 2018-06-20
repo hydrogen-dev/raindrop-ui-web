@@ -60,7 +60,8 @@ app.use(cookieParser('hydro'));
 
 app.use(session({
   secret: 'hydro', // should in reality be an actual secret
-  resave: true, // will vary per-project
+  resave: false, // will vary per-project
+  rolling: true,
   saveUninitialized: false, // will vary per-project
   cookie: { secure: false } // secure should be set to true in a production environment
 }))

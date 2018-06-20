@@ -4,6 +4,7 @@ var router = express.Router();
 // verifies signatures from internal users that have a registered hydro username
 router.post('/', async function(req, res, next) {
   let message = req.session.message; // get the message from the session
+  console.log(`Verifying the following code: '${message}'`)
   // WARNING: THE FOLLOWING LINE IS NOT PRODUCTION-SAFE.
   // Backend logic should not trust data passed in from a front-end. Rely on server-side sessions instead.
   let internalUsername = req.body.internalUsername;
