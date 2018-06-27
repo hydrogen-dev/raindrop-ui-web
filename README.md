@@ -10,6 +10,8 @@ This UI demo is an example implementation of the Client-Side Raindrop Authentica
 
 - Initialize the example frontend: visit the [frontend/](./frontend) folder for setup instructions.
 
+Note: If you restart your backend without refreshing the frontend, it's possible for some session variables to get out of sync. Not to fear, simply refreshing the frontend should fix any issues!
+
 ## Terms
 Once your demo is live, you can begin testing out the system! It will be helpful to define some key terms:
 
