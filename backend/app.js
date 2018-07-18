@@ -36,7 +36,7 @@ app.set('ClientRaindropPartner', ClientRaindropPartner)
 console.log("Javascript SDK for the Hydro API Initialized.")
 
 // initialize database and save it in the backend's shared state
-var db = new sqlite3.Database(path.join('database', 'myDatabase.sqlite'));
+var db = new sqlite3.Database(path.join('database', `myDatabase_${process.env.hydroEnvironment}.sqlite`));
 
 db.run(
   "CREATE TABLE IF NOT EXISTS hydro2FA " +
