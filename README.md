@@ -1,6 +1,6 @@
 # Client-Side Raindrop UI - Web
 
-This UI demo is an example implementation of the Client-Side Raindrop Authentication protocol.
+This UI demo is an example implementation of the Client-Side Raindrop Authentication protocol. For a walkthrough of this process, see our [implementation guide](https://medium.com/hydrogen-api/client-side-raindrop-an-implementation-guide-4e61c84e9dda).
 
 ## Initial Setup
 
